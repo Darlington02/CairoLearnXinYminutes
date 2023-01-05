@@ -23,5 +23,53 @@ protostar init
 
 2. It would then request the project's name and the library's directory name, you'd need to fill in this, and a new project will be initialized successfully.
 
-# Compiling, Declaring And Deploying StarkNet Contracts
+# Compiling, Declaring, Deploying And Interacting With StarkNet Contracts
 For the purpose of this tutorial, head over to this [github repo](https://github.com/Darlington02/CairoLearnXinYminutes) and clone locally.
+
+Within the `src` folder you'll find a boilerplate contract that comes with initializing a new Protostar project, `main.cairo`. We are going to be compiling, declaring and deploying this contract.
+
+## Compiling Contracts
+To compile a Cairo contract using Protostar, ensure a path to the contract is specified in the `[contracts]` section of the `protostar.toml` file. Once you've done that, open your terminal and run the command:
+```
+protostar build
+```
+And you should get an output similar to what you see below, with a `main.json` and `main_abi.json` files created in the `build` folder.
+<img src="./cairo_assets/build.png" alt="building your contract">
+
+## Declaring Contracts
+With the recent StarkNet update to 0.10.3, the DEPLOY transaction was deprecated and no longer works. To deploy a transaction, you must first declare a Contract to obtain the class hash, then deploy the declared contract using the [Universal Deployer Contract](https://community.starknet.io/t/universal-deployer-contract-proposal/1864).
+
+Before declaring or deploying your contract using Protostar, you should set the private key associated with the specified account address in a file, or in the terminal. To set your private key in the terminal, run the command:
+
+```
+export PROTOSTAR_ACCOUNT_PRIVATE_KEY=[YOUR PRIVATE KEY HERE]
+```
+
+Then to declare our contract using Protostar run the following command:
+```
+protostar declare ./build/main.json --network testnet --account 0x0691622bBFD29e835bA4004e7425A4e9630840EbD11c5269DE51C16774585b16 --max-fee auto
+```
+
+where `network` specifies the network we are deploying to, `account` specifies account whose private key we are using, `max-fee` specifies the maximum fee to be paid for the transaction. You should get the class hash outputted as seen below:
+<img src="./cairo_assets/declare.png" alt="declaring your contract">
+
+## Deploying Contracts
+After obtaining our class hash from declaring, we can now deploy using the below command:
+```
+protostar deploy 0x02a5de1b145e18dfeb31c7cd7ff403714ededf5f3fdf75f8b0ac96f2017541bc --network testnet --account 0x0691622bBFD29e835bA4004e7425A4e9630840EbD11c5269DE51C16774585b16 --max-fee auto
+```
+
+where `0x02a5de1b145e18dfeb31c7cd7ff403714ededf5f3fdf75f8b0ac96f2017541bc` is the class hash of our contract.
+<img src="./cairo_assets/deploy.png" alt="deploying your contract">
+
+## Interacting With Contracts
+To interact with your deployed contract, we will be using Argent X (alternative - Braavos), and Starkscan (alternative - Voyager). To install and setup Argent X, check out this [guide](https://www.argent.xyz/learn/how-to-create-an-argent-x-wallet/).
+
+Copy your contract address, displayed on screen from the previous step, and head over to [Starkscan](https://testnet.starkscan.co/) to search for the contract. Once found, you can make write calls to the contract by following the steps below:
+1. Click on the "connect wallet" button
+<img src="./cairo_assets/connect.png" alt="connect wallet">
+2. Select Argent X and approve the connection
+<img src="./cairo_assets/connect2.png" alt="connect to argentX">
+3. You can now make read and write calls easily.
+
+# Let's learn Cairo
