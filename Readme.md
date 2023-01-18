@@ -149,7 +149,7 @@ Now unto the main lessons
     %lang starknet
 
     // This directive informs the compiler you are writing a contract and not a program. 
-    // The difference between both is contracts have access to StarkNet's storage, contracts don't and as such are stateless.
+    // The difference between both is contracts have access to StarkNet's storage, programs don't and as such are stateless.
 
     // There are important functions you might need to import from the official Cairo-lang library or Openzeppelin's. e.g.
     
@@ -161,7 +161,7 @@ Now unto the main lessons
 
 ### 3. DATA STRUCTURES
 ```
-    // A. Storage variables
+    // A. STORAGE VARIABLES
     // Cairo's storage is a map with 2^251 slots, where each slot is a felt which is initialized to 0.
     // You create one using the @storage_var decorator
 
@@ -169,14 +169,14 @@ Now unto the main lessons
         func names() -> (name: felt){
         }
 
-    // B. Storage mappings
+    // B. STORAGE MAPPINGS
     // Unlike soldity where mappings have a separate keyword, in Cairo you create mappings using storage variables.
 
         @storage_var
         func names(address: felt) -> (name: felt){
         }
 
-    // C. Structs
+    // C. STRUCTS
     // Structs are a means to create custom data types in Cairo.
     // You create a struct in Cairo using the `struct` keyword.
 
@@ -186,7 +186,7 @@ Now unto the main lessons
             address: felt,
         }
 
-    // D. Events
+    // D. EVENTS
     // Events allows a contract emit information during the course of its execution, that can be used outside of StarkNet.
     // To create an event:
 
@@ -201,12 +201,56 @@ Now unto the main lessons
 
 ### 4. CONSTRUCTORS, EXTERNAL AND VIEW FUNCTIONS
 ```
+    // A. CONSTRUCTORS
+    // Constructors are a way to intialize state variables on contract deployment
+    // You create a constructor using the @constructor decorator
 
+        @constructor
+        func constructor{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_check_ptr}(_name: felt) {
+            let (caller) = get_caller_address();
+            names.write(caller, _name);
+            return ();
+        }
+    
+    // B. EXTERNAL FUNCTIONS
+    // External functions are functions that modifies the state of the network
+    // You create an external function using the @external decorator
+
+        @external
+        func store_name{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_check_ptr}(_name: felt){
+            let (caller) = get_caller_address();
+            names.write(caller, _name);
+            stored_name.emit(caller, _name);
+            return ();
+        }
+
+    // C. VIEW FUNCTIONS
+    // View functions do not modify the state of the blockchain
+    // You can create a view function using the @view decorator
+
+        @view
+        func get_name{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_check_ptr}(_address: felt) -> (name: felt){
+            let (name) = names.read(_address);
+            return (name,);
+        }
+
+    // NB: Unlike Solidity, Cairo supports just External and View function types. 
+    // You can alternatively also create an internal function by not adding any decorator to the function.
 ```
 
 ### 5. DECORATORS
 ```
-    
+    // All functions in Cairo are specified by the `func` keyword, which can be confusing.
+    // Decorators are used by the compiler to distinguish between these functions.
+
+    // Here are the most common decorators you'll encounter in Cairo:
+
+    // 1. @storage_var — used for specifying state variables.
+    // 2. @constructor — used for specifying constructors.
+    // 3. @external — used for specifying functions that write to a state variable.
+    // 4. @event — used for specifying events
+    // 5. @view — used for specifying functions that reads from a state variable.
+    // 6. @l1_handler — used for specifying functions that processes message sent from an L1 contract in a messaging bridge.
 ```
 
 ### 6. BUILTINS, HINTS & IMPLICIT ARGUMENTS
