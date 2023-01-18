@@ -73,3 +73,56 @@ Copy your contract address, displayed on screen from the previous step, and head
 3. You can now make read and write calls easily.
 
 # Let's learn Cairo
+```
+    // First let's look at a default contract that comes with Protostar
+    // Allows you to set balanace on deployment, increase, and get the balance.
+
+    // Language directive - instructs compiler its a StarkNet contract
+    %lang starknet
+
+    // Library imports from the Cairo-lang library
+    from starkware.cairo.common.math import assert_nn
+    from starkware.cairo.common.cairo_builtins import HashBuiltin
+
+    // @dev Storage variable that stores the balance of a user. 
+    // @storage_var is a decorator that instructs the compiler the function below it is a storage variable.
+    @storage_var
+    func balance() -> (res: felt) {
+    }
+
+    // @dev Constructor writes the balance variable to 0 on deployment
+    // Constructors sets storage variables on deployment. Can accept arguments too.
+    @constructor
+    func constructor{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_check_ptr}() {
+        balance.write(0);
+        return ();
+    }
+
+    // @dev increase_balance updates the balance variable
+    // @param amount the amount you want to add to balance
+    // @external is a decorator that specifies the func below it is an external function.
+    @external
+    func increase_balance{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_check_ptr}(
+        amount: felt
+    ) {
+        with_attr error_message("Amount must be positive. Got: {amount}.") {
+            assert_nn(amount);
+        }
+
+        let (res) = balance.read();
+        balance.write(res + amount);
+        return ();
+    }
+
+    // @dev returns the balance variable
+    // @view is a decorator that specifies the func below it is a view function. 
+    @view
+    func get_balance{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_check_ptr}() -> (res: felt) {
+        let (res) = balance.read();
+        return (res,);
+    }
+
+    // before proceeding, try to build, deploy and interact with this contract! 
+    // NB: Should be at main.cairo if you are using Protostar.
+
+```
