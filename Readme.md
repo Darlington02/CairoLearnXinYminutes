@@ -186,7 +186,14 @@ Now unto the main lessons
             address: felt,
         }
 
-    // D. EVENTS
+    // D. CONSTANTS
+    // Constants are fixed and as such can't be altered after being set.
+    // To create a constant in Cairo, you use the `const` keyword.
+    // Its proper practice to capitalize constant names.
+
+        const USER = 0x01C6cfC1DB2ae90dACEA243F0a8C2F4e32560F7cDD398e4dA2Cc56B733774E9b
+
+    // E. EVENTS
     // Events allows a contract emit information during the course of its execution, that can be used outside of StarkNet.
     // To create an event:
 
@@ -258,9 +265,25 @@ Now unto the main lessons
 
 ```
 
-### 7. ERROR MESSAGES & USER AUTHENTICATIONS
+### 7. ERROR MESSAGES & ACCESS CONTROLS
 ```
+    // You can create custom errors in Cairo which is outputted to the user upon failed execution.
+    // This can be very useful for implementing checks and proper access control mechanisms.
+    // An example is preventing a user to call a function except user is admin.
 
+    // imports
+    from starkware.starknet.common.syscalls import get_caller_address
+
+    // create an admin constant
+    const ADMIN = 0x01C6cfC1DB2ae90dACEA243F0a8C2F4e32560F7cDD398e4dA2Cc56B733774E9b
+
+    // implement access control
+    with_attr error_message("You do not have access to make this action!"){
+        let (caller) = get_caller_address();
+        assert ADMIN = caller;
+    }
+
+    // using an assert statement throws if condition is not true, thus returning the specified error.
 ```
 
 ### 8. CONTRACT INTERFACES
