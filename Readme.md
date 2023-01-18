@@ -144,12 +144,59 @@ Now unto the main lessons
 
 ### 2. LANG DIRECTIVE AND IMPORTS
 ```
+    // To get started with writing a StarkNet contract, you must specify the directive:
 
+    %lang starknet
+
+    // This directive informs the compiler you are writing a contract and not a program. 
+    // The difference between both is contracts have access to StarkNet's storage, contracts don't and as such are stateless.
+
+    // There are important functions you might need to import from the official Cairo-lang library or Openzeppelin's. e.g.
+    
+    from starkware.cairo.common.cairo_builtins import HashBuiltin
+    from cairo_contracts.src.openzeppelin.token.erc20.library import ERC20
+    from starkware.cairo.common.uint256 import Uint256
+    from starkware.cairo.common.bool import TRUE
 ```
 
 ### 3. DATA STRUCTURES
 ```
-    // storage variables, struct, events
+    // A. Storage variables
+    // Cairo's storage is a map with 2^251 slots, where each slot is a felt which is initialized to 0.
+    // You create one using the @storage_var decorator
+
+        @storage_var
+        func names() -> (name: felt){
+        }
+
+    // B. Storage mappings
+    // Unlike soldity where mappings have a separate keyword, in Cairo you create mappings using storage variables.
+
+        @storage_var
+        func names(address: felt) -> (name: felt){
+        }
+
+    // C. Structs
+    // Structs are a means to create custom data types in Cairo.
+    // You create a struct in Cairo using the `struct` keyword.
+
+        struct Person {
+            name: felt,
+            age: felt,
+            address: felt,
+        }
+
+    // D. Events
+    // Events allows a contract emit information during the course of its execution, that can be used outside of StarkNet.
+    // To create an event:
+
+        @event
+        func name_stored(address, name) {
+        }
+
+    // To emit an event:
+
+        name_stored.emit(address, name);
 ```
 
 ### 4. CONSTRUCTORS, EXTERNAL AND VIEW FUNCTIONS
