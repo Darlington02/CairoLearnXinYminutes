@@ -126,3 +126,76 @@ Copy your contract address, displayed on screen from the previous step, and head
     // NB: Should be at main.cairo if you are using Protostar.
 
 ```
+Now unto the main lessons
+
+### 1. THE FELT DATA TYPE
+```
+    // Unlike solidity, where you have access to various data types, Cairo comes with just a single data type..felts
+    // Felts stands for Field elements, and are a 252 bit integer in the range 0<=x<=P where P is a prime number.
+    // You can create a Uint256 in Cairo by utlizing a struct of two 128 bits felts.
+
+    struct Uint256 {
+        low: felt, // The low 128 bits of the value.
+        high: felt, // The high 128 bits of the value.
+    }
+
+    // To avoid running into issues with divisions, it's safer to work with the unsigned_div_rem method from Cairo-lang's library.
+```
+
+### 2. LANG DIRECTIVE AND IMPORTS
+```
+
+```
+
+### 3. DATA STRUCTURES
+```
+    // storage variables, struct, events
+```
+
+### 4. CONSTRUCTORS, EXTERNAL AND VIEW FUNCTIONS
+```
+
+```
+
+### 5. DECORATORS
+```
+    
+```
+
+### 6. BUILTINS, HINTS & IMPLICIT ARGUMENTS
+```
+
+```
+
+### 7. ERROR MESSAGES & USER AUTHENTICATIONS
+```
+
+```
+
+### 8. CONTRACT INTERFACES
+```
+
+```
+
+### 9. RECURSIONS
+```
+
+```
+
+Some low-level stuffs
+
+### 10. REGISTERS
+```
+
+```
+
+### 11. REVOKED REFERENCES
+```
+
+```
+
+# FULL CONTRACT EXAMPLE
+Below is a full contract example that implements most of what we just learnt! Re-write, deploy, have fun!
+```
+
+```
