@@ -178,6 +178,7 @@ Now unto the main lessons
 
     // C. STRUCTS
     // Structs are a means to create custom data types in Cairo.
+    // A Struct has a size, which is the sum of the sizes of its members. The size can be retrieved using MyStruct.SIZE.
     // You create a struct in Cairo using the `struct` keyword.
 
         struct Person {
@@ -188,12 +189,39 @@ Now unto the main lessons
 
     // D. CONSTANTS
     // Constants are fixed and as such can't be altered after being set.
+    // They evaluate to an integer (field element) at compile time.
     // To create a constant in Cairo, you use the `const` keyword.
     // Its proper practice to capitalize constant names.
 
         const USER = 0x01C6cfC1DB2ae90dACEA243F0a8C2F4e32560F7cDD398e4dA2Cc56B733774E9b
 
-    // E. EVENTS
+    // E. ARRAYS
+    // Arrays can be defined as a pointer(felt*) to the first element of the array.
+    // As an array is populated, its elements take up contigous memory cells.
+    // The `alloc` keyword can be used to dynamically allocate a new memory segment, which can be used to store an array
+
+        let (myArray: felt*) = alloc ();
+        assert myArray[0] = 1;
+        assert myArray[1] = 2;
+        assert myArray[3] = 3;
+
+    // You can also use the `new` operator to create fixed-size arrays using tuples
+    // The new operator is useful as it enables you allocate memory and initialize the object in one instruction
+
+        func foo() {
+            tempvar arr: felt* = new (1, 1, 2, 3, 5);
+            assert arr[4] = 5;
+            return ();
+        }
+
+    // F. TUPLES
+    // A tuple is a finite, ordered, unchangeable list of elements
+    // It is represented as a comma-separated list of elements enclosed by parentheses
+    // Their elements may be of any combination of valid types.
+
+        local tuple0: (felt, felt, felt) = (7, 9, 13);
+
+    // G. EVENTS
     // Events allows a contract emit information during the course of its execution, that can be used outside of StarkNet.
     // To create an event:
 
@@ -262,7 +290,39 @@ Now unto the main lessons
 
 ### 6. BUILTINS, HINTS & IMPLICIT ARGUMENTS
 ```
+    // A. BUILTINS
+    // Builtins are predefined optimized low-level execution units, which are added to Cairo’s CPU board.
+    // They help perform predefined computations like pedersen hashing, bitwise operations etc, which are expensive to perform in Vanilla Cairo.
+    // Each builtin in Cairo, is assigned a separate memory location, accessible through regular Cairo memory calls using implicit parameters.
+    // You specify them using the %builtins directive
 
+    // Here is a list of available builtins in Cairo:
+    // 1. output — the output builtin is used for writing program outputs
+    // 2. pedersen — the pedersen builtin is used for pedersen hashing computations
+    // 3. range_check — This builtin is mostly used for integer comparisons, and facilitates check to confirm that a field element is within a range [0, 2^128)
+    // 4. ecdsa — the ecdsa builtin is used for verifying ECDSA signatures
+    // 5. bitwise — the bitwise builtin is used for carrying out bitwise operations on felts
+
+    // B. HINTS
+    // Hints are pieces of Python codes, which contains instructions that only the prover sees and executes
+    // From the point of view of the verifier these hints do not exist
+    // To specify a hint in Cairo, you need to encapsulate it within %{ and%}
+    // Its good practice to avoid using hints as much as you can in your contracts, as hints are not added to the bytecode, and thus do not count in the total number of execution steps.
+
+        %{ 
+            # Python hint goes here 
+        %}
+
+    // C. IMPLICIT ARGUMENTS
+    // Implicit arguments are not restrcited to the function body, but can be inherited by other functions calls that require them.
+    // Implicit arguments are passed in between curly bracelets, like you can see below:
+
+        func store_name{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_check_ptr}(_name: felt){
+            let (caller) = get_caller_address();
+            names.write(caller, _name);
+            stored_name.emit(caller, _name);
+            return ();
+        }
 ```
 
 ### 7. ERROR MESSAGES & ACCESS CONTROLS
@@ -306,6 +366,27 @@ Some low-level stuffs
 ### 11. REVOKED REFERENCES
 ```
 
+```
+
+Miscellaneous
+
+### 12. Understanding Cairo's punctuations
+```
+    // ; (semicolon). Used at the end of each instruction
+
+    // ( ) (parentheses). Used in a function declaration, if statements, and in a tuple declaration
+
+    // { } (curly brackets). Used in a declaration of implicit arguments and to define code blocks.
+
+    // [ ] (square brackets). Standalone brackets represent the value at a particular address location (such as the allocation pointer, [ap]). Brackets following a pointer or a tuple act as a subscript operator, where x[2] represents the element with index 2 in x.
+
+    // * Single asterisk. Refers to the pointer of an expression.
+
+    // % Percent sign. Appears at the start of a directive, such as %builtins or %lang.
+
+    // %{ %} Represents Python hints.
+
+    // _ (underscore). A placeholder to handle values that are not used, such as an unused function return value.
 ```
 
 # FULL CONTRACT EXAMPLE
