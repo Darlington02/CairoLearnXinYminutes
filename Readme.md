@@ -73,8 +73,8 @@ Copy your contract address, displayed on screen from the previous step, and head
 3. You can now make read and write calls easily.
 
 # Let's learn Cairo
+First let's look at a default contract that comes with Protostar
 ```
-    // First let's look at a default contract that comes with Protostar
     // Allows you to set balanace on deployment, increase, and get the balance.
 
     // Language directive - instructs compiler its a StarkNet contract
@@ -285,7 +285,8 @@ Now unto the main lessons
     // 3. @external — used for specifying functions that write to a state variable.
     // 4. @event — used for specifying events
     // 5. @view — used for specifying functions that reads from a state variable.
-    // 6. @l1_handler — used for specifying functions that processes message sent from an L1 contract in a messaging bridge.
+    // 6. @contract_interface - used for specifying function interfaces.
+    // 7. @l1_handler — used for specifying functions that processes message sent from an L1 contract in a messaging bridge.
 ```
 
 ### 6. BUILTINS, HINTS & IMPLICIT ARGUMENTS
@@ -314,7 +315,7 @@ Now unto the main lessons
         %}
 
     // C. IMPLICIT ARGUMENTS
-    // Implicit arguments are not restrcited to the function body, but can be inherited by other functions calls that require them.
+    // Implicit arguments are not restricted to the function body, but can be inherited by other functions calls that require them.
     // Implicit arguments are passed in between curly bracelets, like you can see below:
 
         func store_name{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_check_ptr}(_name: felt){
@@ -348,7 +349,23 @@ Now unto the main lessons
 
 ### 8. CONTRACT INTERFACES
 ```
+    // Contract interfaces provide a means for one contract to invoke or call the external function of another contract.
+    // To create a contract interface, you use the @contract_interface keyword
 
+        @contract_interface
+        namespace IENS {
+            func store_name(_name: felt) {
+            }
+
+            func get_name(_address: felt) -> (name: felt) {
+            }
+        }
+
+    // Once a contract interface is specified, any contract can make calls to that contract passing in the contract address as the first parameter like this:
+
+        IENS.store_name(contract_address, _name);
+
+    // Note that Interfaces excludes the function body/logic and the implicit arguments.
 ```
 
 ### 9. RECURSIONS
@@ -365,7 +382,36 @@ Some low-level stuffs
 
 ### 11. REVOKED REFERENCES
 ```
+    // Revoked references occurs when there is a call instruction to another function, between the definition of a reference variable that depends on `ap`(temp variables) and its usage. This occurs as the compiler may not be able to compute the change of `ap` (as one may jump to the label from another place in the program, or call a function that might change ap in an unknown way).
 
+    // Here is an example to demonstrate what I mean:
+
+        @external
+        func get_balance{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_check_ptr}() -> (res: felt) {
+            return (res=100);
+        }
+
+        @external
+        func double_balance{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_check_ptr}() -> (res: felt) {
+            let multiplier = 2;
+            let (balance) = get_balance();
+            let new_balance = balance * multiplier;
+            return (res=new_balance);
+        }
+    
+    // If you run that code, you'll run into the revoked reference error as we are trying to access the `multiplier` variable after calling the get_balance function;
+
+    // To solve revoked references, In simple cases you can resolve this issue, by adding the keyword, `alloc_locals` within function scopes, but in most complex cases you might need to create a local variable to resolve it.
+
+    // resolving the `double_balance` function:
+        @external
+        func double_balance{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_check_ptr}() -> (res: felt) {
+            alloc_locals;
+            let multiplier = 2;
+            let (balance) = get_balance();
+            let new_balance = balance * multiplier;
+            return (res=new_balance);
+        }
 ```
 
 Miscellaneous
