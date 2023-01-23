@@ -1,3 +1,10 @@
+---
+language: Cairo
+filename: learnCairo.sol
+contributors:
+  - ["Darlington Nnam", "https://github.com/Darlington02"]
+---
+
 # Cairo
 Cairo is StarkNet's native language and the first Turing-complete language for scripting provable programs (where one party can prove to another that a certain computation was executed correctly) for general computations.
 # StarkNet
