@@ -370,14 +370,39 @@ Now unto the main lessons
 
 ### 9. RECURSIONS
 ```
+    // Due to the unavailability of loops, Recursions are the go-to for similar operations.
+    // In simple terms, a recursive function is one which calls itself repeatedly.
 
+    // A good example to demonstrate this is writing a function for getting the nth fibonacci number:
+
+        @external
+        func fibonacci{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_check_ptr}(n : felt) -> (result : felt){
+            alloc_locals;
+            if (n == 0){
+                return (0);
+            }
+            if (n == 1){
+                return (1);
+            }
+            let (local x) = fibonacci(n - 1);
+            let (local y) = fibonacci(n - 2);
+            return (result=(x + y));
+        }
+
+    // The nth fibonacci term is the sum of the nth - 1 and the nth - 2 numbers, that's why we get these two as (x, y) using recursion.
+    // NB: when implementing recursive functions, always remember to implement a base case (n==0, n==1 in our case), to prevent stack overflow.
 ```
 
 Some low-level stuffs
 
 ### 10. REGISTERS
 ```
+    // Registers holds values that may change over time.
 
+    // There are 3 major types of Registers:
+    // 1. ap (allocation pointer) points to a yet unused memory. Temporary variables created using `let`, `tempvar` are held here, and thus susceptible to being revoked
+    // 2. fp (frame pointer) points to the frame of the current function. The address of all the function arguments and local variables are relative to this register and as such can never be revoked
+    // 3. pc (program counter) points to the current instruction
 ```
 
 ### 11. REVOKED REFERENCES
