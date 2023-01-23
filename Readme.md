@@ -708,6 +708,7 @@ Below is a simple automated market maker contract example that implements most o
 1. [Amarna static analysis for Cairo programs](https://blog.trailofbits.com/2022/04/20/amarna-static-analysis-for-cairo-programs/)
 2. [Cairo and StarkNet security by Ctrl03](https://ctrlc03.github.io/)
 3. [How to hack almost any Cairo smart contract](https://medium.com/ginger-security/how-to-hack-almost-any-starknet-cairo-smart-contract-67b4681ac0f6)
+4. [Analyzing Cairo code using Armana](https://dic0de.substack.com/p/analyzing-cairo-code-using-amarna?sd=pf)
 
 # Future TO-DOs
-Update tutorial to Cairo 1.0
+Update tutorial to fit Cairo 1.0
