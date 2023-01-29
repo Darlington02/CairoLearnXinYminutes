@@ -81,7 +81,7 @@ Copy your contract address, displayed on screen from the previous step, and head
 
 # Let's learn Cairo
 First let's look at a default contract that comes with Protostar
-```
+```cairo
     // Allows you to set balanace on deployment, increase, and get the balance.
 
     // Language directive - instructs compiler its a StarkNet contract
@@ -136,7 +136,7 @@ First let's look at a default contract that comes with Protostar
 Now unto the main lessons
 
 ### 1. THE FELT DATA TYPE
-```
+```cairo
     // Unlike solidity, where you have access to various data types, Cairo comes with just a single data type..felts
     // Felts stands for Field elements, and are a 252 bit integer in the range 0<=x<=P where P is a prime number.
     // You can create a Uint256 in Cairo by utlizing a struct of two 128 bits felts.
@@ -150,7 +150,7 @@ Now unto the main lessons
 ```
 
 ### 2. LANG DIRECTIVE AND IMPORTS
-```
+```cairo
     // To get started with writing a StarkNet contract, you must specify the directive:
 
     %lang starknet
@@ -167,7 +167,7 @@ Now unto the main lessons
 ```
 
 ### 3. DATA STRUCTURES
-```
+```cairo
     // A. STORAGE VARIABLES
     // Cairo's storage is a map with 2^251 slots, where each slot is a felt which is initialized to 0.
     // You create one using the @storage_var decorator
@@ -242,7 +242,7 @@ Now unto the main lessons
 ```
 
 ### 4. CONSTRUCTORS, EXTERNAL AND VIEW FUNCTIONS
-```
+```cairo
     // A. CONSTRUCTORS
     // Constructors are a way to intialize state variables on contract deployment
     // You create a constructor using the @constructor decorator
@@ -281,7 +281,7 @@ Now unto the main lessons
 ```
 
 ### 5. DECORATORS
-```
+```cairo
     // All functions in Cairo are specified by the `func` keyword, which can be confusing.
     // Decorators are used by the compiler to distinguish between these functions.
 
@@ -297,7 +297,7 @@ Now unto the main lessons
 ```
 
 ### 6. BUILTINS, HINTS & IMPLICIT ARGUMENTS
-```
+```cairo
     // A. BUILTINS
     // Builtins are predefined optimized low-level execution units, which are added to Cairo’s CPU board.
     // They help perform predefined computations like pedersen hashing, bitwise operations etc, which are expensive to perform in Vanilla Cairo.
@@ -334,7 +334,7 @@ Now unto the main lessons
 ```
 
 ### 7. ERROR MESSAGES & ACCESS CONTROLS
-```
+```cairo
     // You can create custom errors in Cairo which is outputted to the user upon failed execution.
     // This can be very useful for implementing checks and proper access control mechanisms.
     // An example is preventing a user to call a function except user is admin.
@@ -355,7 +355,7 @@ Now unto the main lessons
 ```
 
 ### 8. CONTRACT INTERFACES
-```
+```cairo
     // Contract interfaces provide a means for one contract to invoke or call the external function of another contract.
     // To create a contract interface, you use the @contract_interface keyword
 
@@ -376,7 +376,7 @@ Now unto the main lessons
 ```
 
 ### 9. RECURSIONS
-```
+```cairo
     // Due to the unavailability of loops, Recursions are the go-to for similar operations.
     // In simple terms, a recursive function is one which calls itself repeatedly.
 
@@ -403,7 +403,7 @@ Now unto the main lessons
 Some low-level stuffs
 
 ### 10. REGISTERS
-```
+```cairo
     // Registers holds values that may change over time.
 
     // There are 3 major types of Registers:
@@ -413,7 +413,7 @@ Some low-level stuffs
 ```
 
 ### 11. REVOKED REFERENCES
-```
+```cairo
     // Revoked references occurs when there is a call instruction to another function, between the definition of a reference variable that depends on `ap`(temp variables) and its usage. This occurs as the compiler may not be able to compute the change of `ap` (as one may jump to the label from another place in the program, or call a function that might change ap in an unknown way).
 
     // Here is an example to demonstrate what I mean:
@@ -469,7 +469,7 @@ Miscellaneous
 
 # FULL CONTRACT EXAMPLE
 Below is a simple automated market maker contract example that implements most of what we just learnt! Re-write, deploy, have fun!
-```
+```cairo
     %lang starknet
 
     from starkware.cairo.common.cairo_builtins import HashBuiltin
