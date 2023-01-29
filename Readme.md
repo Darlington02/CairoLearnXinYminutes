@@ -164,7 +164,8 @@ func balance() -> (res: felt) {
 // Constructors sets storage variables on deployment. Can accept arguments too.
 @constructor
 func constructor{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*,
-    range_check_ptr}() {balance.write(0); return ();}
+    range_check_ptr}() {balance.write(0); return ();
+}
 
 // @dev increase_balance updates the balance variable
 // @param amount the amount you want to add to balance
@@ -201,11 +202,11 @@ Now unto the main lessons
 
 ```cairo
     // Unlike solidity, where you have access to various data types, Cairo
-comes with just a single data type..felts
+    // comes with just a single data type..felts
     // Felts stands for Field elements, and are a 252 bit integer in the range
-0<=x<=P where P is a prime number.
+    // 0<=x<=P where P is a prime number.
     // You can create a Uint256 in Cairo by utlizing a struct of two 128 bits
-felts.
+    // felts.
 
     struct Uint256 {
         low: felt, // The low 128 bits of the value.
@@ -213,24 +214,24 @@ felts.
     }
 
     // To avoid running into issues with divisions, it's safer to work with the
-unsigned_div_rem method from Cairo-lang's library.
+    // unsigned_div_rem method from Cairo-lang's library.
 ```
 
 ### 2. LANG DIRECTIVE AND IMPORTS
 
 ```cairo
     // To get started with writing a StarkNet contract, you must specify the
-directive:
+    // directive:
 
     %lang starknet
 
     // This directive informs the compiler you are writing a contract and not a
-program.
+    // program.
     // The difference between both is contracts have access to StarkNet's
-storage, programs don't and as such are stateless.
+    // storage, programs don't and as such are stateless.
 
     // There are important functions you might need to import from the official
-Cairo-lang library or Openzeppelin's. e.g.
+    // Cairo-lang library or Openzeppelin's. e.g.
 
     from starkware.cairo.common.cairo_builtins import HashBuiltin
     from cairo_contracts.src.openzeppelin.token.erc20.library import ERC20
@@ -243,7 +244,7 @@ Cairo-lang library or Openzeppelin's. e.g.
 ```cairo
     // A. STORAGE VARIABLES
     // Cairo's storage is a map with 2^251 slots, where each slot is a felt
-which is initialized to 0.
+    // which is initialized to 0.
     // You create one using the @storage_var decorator
 
         @storage_var
@@ -252,7 +253,7 @@ which is initialized to 0.
 
     // B. STORAGE MAPPINGS
     // Unlike soldity where mappings have a separate keyword, in Cairo you
-create mappings using storage variables.
+    // create mappings using storage variables.
 
         @storage_var
         func names(address: felt) -> (name: felt){
@@ -261,7 +262,7 @@ create mappings using storage variables.
     // C. STRUCTS
     // Structs are a means to create custom data types in Cairo.
     // A Struct has a size, which is the sum of the sizes of its members. The
-size can be retrieved using MyStruct.SIZE.
+    // size can be retrieved using MyStruct.SIZE.
     // You create a struct in Cairo using the `struct` keyword.
 
         struct Person {
@@ -281,10 +282,10 @@ size can be retrieved using MyStruct.SIZE.
 
     // E. ARRAYS
     // Arrays can be defined as a pointer(felt*) to the first element of the
-array.
+    //array.
     // As an array is populated, its elements take up contigous memory cells.
     // The `alloc` keyword can be used to dynamically allocate a new memory
-segment, which can be used to store an array
+    // segment, which can be used to store an array
 
         let (myArray: felt*) = alloc ();
         assert myArray[0] = 1;
@@ -292,9 +293,9 @@ segment, which can be used to store an array
         assert myArray[3] = 3;
 
     // You can also use the `new` operator to create fixed-size arrays using
-tuples
+    //tuples
     // The new operator is useful as it enables you allocate memory and
-initialize the object in one instruction
+    // initialize the object in one instruction
 
         func foo() {
             tempvar arr: felt* = new (1, 1, 2, 3, 5);
@@ -305,14 +306,14 @@ initialize the object in one instruction
     // F. TUPLES
     // A tuple is a finite, ordered, unchangeable list of elements
     // It is represented as a comma-separated list of elements enclosed by
-parentheses
+    // parentheses
     // Their elements may be of any combination of valid types.
 
         local tuple0: (felt, felt, felt) = (7, 9, 13);
 
     // G. EVENTS
     // Events allows a contract emit information during the course of its
-execution, that can be used outside of StarkNet.
+    // execution, that can be used outside of StarkNet.
     // To create an event:
 
         @event
@@ -329,12 +330,12 @@ execution, that can be used outside of StarkNet.
 ```cairo
     // A. CONSTRUCTORS
     // Constructors are a way to intialize state variables on contract
-deployment
+    // deployment
     // You create a constructor using the @constructor decorator
 
         @constructor
         func constructor{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*,
-range_check_ptr}(_name: felt) {
+        range_check_ptr}(_name: felt) {
             let (caller) = get_caller_address();
             names.write(caller, _name);
             return ();
@@ -346,7 +347,7 @@ range_check_ptr}(_name: felt) {
 
         @external
         func store_name{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*,
-range_check_ptr}(_name: felt){
+        range_check_ptr}(_name: felt){
             let (caller) = get_caller_address();
             names.write(caller, _name);
             stored_name.emit(caller, _name);
@@ -359,37 +360,37 @@ range_check_ptr}(_name: felt){
 
         @view
         func get_name{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*,
-range_check_ptr}(_address: felt) -> (name: felt){
+        range_check_ptr}(_address: felt) -> (name: felt){
             let (name) = names.read(_address);
             return (name,);
         }
 
     // NB: Unlike Solidity, Cairo supports just External and View function
-types.
+    // types.
     // You can alternatively also create an internal function by not adding any
-decorator to the function.
+    // decorator to the function.
 ```
 
 ### 5. DECORATORS
 
 ```cairo
     // All functions in Cairo are specified by the `func` keyword, which can be
-confusing.
+    // confusing.
     // Decorators are used by the compiler to distinguish between these
-functions.
+    // functions.
 
     // Here are the most common decorators you'll encounter in Cairo:
 
     // 1. @storage_var — used for specifying state variables.
     // 2. @constructor — used for specifying constructors.
     // 3. @external — used for specifying functions that write to a state
-variable.
+    // variable.
     // 4. @event — used for specifying events
     // 5. @view — used for specifying functions that reads from a state
-variable.
+    // variable.
     // 6. @contract_interface - used for specifying function interfaces.
     // 7. @l1_handler — used for specifying functions that processes message
-sent from an L1 contract in a messaging bridge.
+    // sent from an L1 contract in a messaging bridge.
 ```
 
 ### 6. BUILTINS, HINTS & IMPLICIT ARGUMENTS
@@ -397,32 +398,32 @@ sent from an L1 contract in a messaging bridge.
 ```cairo
     // A. BUILTINS
     // Builtins are predefined optimized low-level execution units, which are
-added to Cairo’s CPU board.
+    // added to Cairo’s CPU board.
     // They help perform predefined computations like pedersen hashing, bitwise
-operations etc, which are expensive to perform in Vanilla Cairo.
+    // operations etc, which are expensive to perform in Vanilla Cairo.
     // Each builtin in Cairo, is assigned a separate memory location,
-accessible through regular Cairo memory calls using implicit parameters.
+    // accessible through regular Cairo memory calls using implicit parameters.
     // You specify them using the %builtins directive
 
     // Here is a list of available builtins in Cairo:
     // 1. output — the output builtin is used for writing program outputs
     // 2. pedersen — the pedersen builtin is used for pedersen hashing
-computations
+    // computations
     // 3. range_check — This builtin is mostly used for integer comparisons,
-and facilitates check to confirm that a field element is within a range [0,
-2^128)
+    // and facilitates check to confirm that a field element is within a range [0,
+    // 2^128)
     // 4. ecdsa — the ecdsa builtin is used for verifying ECDSA signatures
     // 5. bitwise — the bitwise builtin is used for carrying out bitwise
-operations on felts
+    // operations on felts
 
     // B. HINTS
     // Hints are pieces of Python codes, which contains instructions that only
-the prover sees and executes
+    // the prover sees and executes
     // From the point of view of the verifier these hints do not exist
     // To specify a hint in Cairo, you need to encapsulate it within %{ and%}
     // Its good practice to avoid using hints as much as you can in your
-contracts, as hints are not added to the bytecode, and thus do not count in the
-total number of execution steps.
+    // contracts, as hints are not added to the bytecode, and thus do not count in the
+    // total number of execution steps.
 
         %{
             # Python hint goes here
@@ -430,12 +431,12 @@ total number of execution steps.
 
     // C. IMPLICIT ARGUMENTS
     // Implicit arguments are not restricted to the function body, but can be
-inherited by other functions calls that require them.
+    // inherited by other functions calls that require them.
     // Implicit arguments are passed in between curly bracelets, like you can
-see below:
+    // see below:
 
         func store_name{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*,
-range_check_ptr}(_name: felt){
+        range_check_ptr}(_name: felt){
             let (caller) = get_caller_address();
             names.write(caller, _name);
             stored_name.emit(caller, _name);
@@ -447,9 +448,9 @@ range_check_ptr}(_name: felt){
 
 ```cairo
     // You can create custom errors in Cairo which is outputted to the user
-upon failed execution.
+    // upon failed execution.
     // This can be very useful for implementing checks and proper access
-control mechanisms.
+    // control mechanisms.
     // An example is preventing a user to call a function except user is admin.
 
     // imports
@@ -466,14 +467,14 @@ control mechanisms.
     }
 
     // using an assert statement throws if condition is not true, thus
-returning the specified error.
+    // returning the specified error.
 ```
 
 ### 8. CONTRACT INTERFACES
 
 ```cairo
     // Contract interfaces provide a means for one contract to invoke or call
-the external function of another contract.
+    // the external function of another contract.
     // To create a contract interface, you use the @contract_interface keyword
 
         @contract_interface
@@ -486,28 +487,28 @@ the external function of another contract.
         }
 
     // Once a contract interface is specified, any contract can make calls to
-that contract passing in the contract address as the first parameter like this:
+    // that contract passing in the contract address as the first parameter like this:
 
         IENS.store_name(contract_address, _name);
 
     // Note that Interfaces excludes the function body/logic and the implicit
-arguments.
+    // arguments.
 ```
 
 ### 9. RECURSIONS
 
 ```cairo
     // Due to the unavailability of loops, Recursions are the go-to for similar
-operations.
+    // operations.
     // In simple terms, a recursive function is one which calls itself
-repeatedly.
+    // repeatedly.
 
     // A good example to demonstrate this is writing a function for getting the
-nth fibonacci number:
+    // nth fibonacci number:
 
         @external
         func fibonacci{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*,
-range_check_ptr}(n : felt) -> (result : felt){
+        range_check_ptr}(n : felt) -> (result : felt){
             alloc_locals;
             if (n == 0){
                 return (0);
@@ -521,9 +522,9 @@ range_check_ptr}(n : felt) -> (result : felt){
         }
 
     // The nth fibonacci term is the sum of the nth - 1 and the nth - 2
-numbers, that's why we get these two as (x, y) using recursion.
+    // numbers, that's why we get these two as (x, y) using recursion.
     // NB: when implementing recursive functions, always remember to implement
-a base case (n==0, n==1 in our case), to prevent stack overflow.
+    // a base case (n==0, n==1 in our case), to prevent stack overflow.
 ```
 
 Some low-level stuffs
@@ -535,11 +536,11 @@ Some low-level stuffs
 
     // There are 3 major types of Registers:
     // 1. ap (allocation pointer) points to a yet unused memory. Temporary
-variables created using `let`, `tempvar` are held here, and thus susceptible to
-being revoked
+    // variables created using `let`, `tempvar` are held here, and thus susceptible to
+    // being revoked
     // 2. fp (frame pointer) points to the frame of the current function. The
-address of all the function arguments and local variables are relative to this
-register and as such can never be revoked
+    // address of all the function arguments and local variables are relative to this
+    // register and as such can never be revoked
     // 3. pc (program counter) points to the current instruction
 ```
 
@@ -547,22 +548,22 @@ register and as such can never be revoked
 
 ```cairo
     // Revoked references occurs when there is a call instruction to another
-function, between the definition of a reference variable that depends on
-`ap`(temp variables) and its usage. This occurs as the compiler may not be able
-to compute the change of `ap` (as one may jump to the label from another place
-in the program, or call a function that might change ap in an unknown way).
+    // function, between the definition of a reference variable that depends on
+    // `ap`(temp variables) and its usage. This occurs as the compiler may not be able
+    // to compute the change of `ap` (as one may jump to the label from another place
+    // in the program, or call a function that might change ap in an unknown way).
 
     // Here is an example to demonstrate what I mean:
 
         @external
         func get_balance{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*,
-range_check_ptr}() -> (res: felt) {
+        range_check_ptr}() -> (res: felt) {
             return (res=100);
         }
 
         @external
         func double_balance{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*,
-range_check_ptr}() -> (res: felt) {
+        range_check_ptr}() -> (res: felt) {
             let multiplier = 2;
             let (balance) = get_balance();
             let new_balance = balance * multiplier;
@@ -570,17 +571,17 @@ range_check_ptr}() -> (res: felt) {
         }
 
     // If you run that code, you'll run into the revoked reference error as we
-are trying to access the `multiplier` variable after calling the get_balance
-function;
+    // are trying to access the `multiplier` variable after calling the get_balance
+    // function;
 
     // To solve revoked references, In simple cases you can resolve this issue,
-by adding the keyword, `alloc_locals` within function scopes, but in most
-complex cases you might need to create a local variable to resolve it.
+    // by adding the keyword, `alloc_locals` within function scopes, but in most
+    // complex cases you might need to create a local variable to resolve it.
 
     // resolving the `double_balance` function:
         @external
         func double_balance{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*,
-range_check_ptr}() -> (res: felt) {
+        range_check_ptr}() -> (res: felt) {
             alloc_locals;
             let multiplier = 2;
             let (balance) = get_balance();
@@ -597,25 +598,25 @@ Miscellaneous
     // ; (semicolon). Used at the end of each instruction
 
     // ( ) (parentheses). Used in a function declaration, if statements, and in
-a tuple declaration
+    // a tuple declaration
 
     // { } (curly brackets). Used in a declaration of implicit arguments and to
-define code blocks.
+    // define code blocks.
 
     // [ ] (square brackets). Standalone brackets represent the value at a
-particular address location (such as the allocation pointer, [ap]). Brackets
-following a pointer or a tuple act as a subscript operator, where x[2]
-represents the element with index 2 in x.
+    // particular address location (such as the allocation pointer, [ap]). Brackets
+    // following a pointer or a tuple act as a subscript operator, where x[2]
+    // represents the element with index 2 in x.
 
     // * Single asterisk. Refers to the pointer of an expression.
 
     // % Percent sign. Appears at the start of a directive, such as %builtins
-or %lang.
+    // or %lang.
 
     // %{ %} Represents Python hints.
 
     // _ (underscore). A placeholder to handle values that are not used, such
-as an unused function return value.
+    // as an unused function return value.
 ```
 
 # FULL CONTRACT EXAMPLE
@@ -630,9 +631,9 @@ of what we just learnt! Re-write, deploy, have fun!
     from starkware.cairo.common.hash import hash2
     from starkware.cairo.common.alloc import alloc
     from starkware.cairo.common.math import (assert_le, assert_nn_le,
-unsigned_div_rem)
+    unsigned_div_rem)
     from starkware.starknet.common.syscalls import (get_caller_address,
-storage_read, storage_write)
+    storage_read, storage_write)
 
     //
     // CONSTANTS
@@ -655,8 +656,7 @@ storage_read, storage_write)
 
     // @dev A map from account and token type to corresponding balance
     @storage_var
-    func account_balance(account_id: felt, token_type: felt) -> (balance: felt)
-{
+    func account_balance(account_id: felt, token_type: felt) -> (balance: felt){
     }
 
     // @dev a map from token type to corresponding pool balance
@@ -673,7 +673,7 @@ storage_read, storage_write)
     // @param token_type Token to be queried
     @view
     func get_account_token_balance{syscall_ptr: felt*, pedersen_ptr:
-HashBuiltin*, range_check_ptr}(
+    HashBuiltin*, range_check_ptr}(
         account_id: felt, token_type: felt
     ) -> (balance: felt) {
         return account_balance.read(account_id, token_type);
@@ -683,7 +683,7 @@ HashBuiltin*, range_check_ptr}(
     // @param token_type Token type to get pool balance
     @view
     func get_pool_token_balance{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*,
-range_check_ptr}(
+    range_check_ptr}(
         token_type: felt
     ) -> (balance: felt) {
         return pool_balance.read(token_type);
@@ -698,7 +698,7 @@ range_check_ptr}(
     // @param balance Amount to be set as balance
     @external
     func set_pool_token_balance{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*,
-range_check_ptr}(
+    range_check_ptr}(
         token_type: felt, balance: felt
     ) {
         with_attr error_message("exceeds maximum allowed tokens!"){
@@ -714,16 +714,16 @@ range_check_ptr}(
     // @param token_b_amount amount of token b to be added
     @external
     func add_demo_token{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*,
-range_check_ptr}(
+    range_check_ptr}(
         token_a_amount: felt, token_b_amount: felt
     ) {
         alloc_locals;
         let (account_id) = get_caller_address();
 
         modify_account_balance(account_id=account_id, token_type=TOKEN_TYPE_A,
-amount=token_a_amount);
+        amount=token_a_amount);
         modify_account_balance(account_id=account_id, token_type=TOKEN_TYPE_B,
-amount=token_b_amount);
+        amount=token_b_amount);
 
         return ();
     }
@@ -733,7 +733,7 @@ amount=token_b_amount);
     // @param token_b amount of token b to be set in pool
     @external
     func init_pool{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*,
-range_check_ptr}(
+    range_check_ptr}(
         token_a: felt, token_b: felt
     ) {
         with_attr error_message("exceeds maximum allowed tokens!"){
@@ -761,8 +761,7 @@ range_check_ptr}(
 
         // verify token_from is TOKEN_TYPE_A or TOKEN_TYPE_B
         with_attr error_message("token not allowed in pool!"){
-            assert (token_from - TOKEN_TYPE_A) * (token_from - TOKEN_TYPE_B) =
-0;
+            assert (token_from - TOKEN_TYPE_A) * (token_from - TOKEN_TYPE_B) = 0;
         }
 
         // check requested amount_from is valid
@@ -772,14 +771,14 @@ range_check_ptr}(
 
         // check user has enough funds
         let (account_from_balance) =
-get_account_token_balance(account_id=account_id, token_type=token_from);
+        get_account_token_balance(account_id=account_id, token_type=token_from);
         with_attr error_message("insufficient balance!"){
             assert_le(amount_from, account_from_balance);
         }
 
         let (token_to) = get_opposite_token(token_type=token_from);
         let (amount_to) = do_swap(account_id=account_id, token_from=token_from,
-token_to=token_to, amount_from=amount_from);
+        token_to=token_to, amount_from=amount_from);
 
         return (amount_to=amount_to);
     }
@@ -794,7 +793,7 @@ token_to=token_to, amount_from=amount_from);
     // @param token_type Token type to be modified
     // @param amount Amount Amount to be added
     func modify_account_balance{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*,
-range_check_ptr}(
+    range_check_ptr}(
         account_id: felt, token_type: felt, amount: felt
     ) {
         let (current_balance) = account_balance.read(account_id, token_type);
@@ -805,43 +804,43 @@ range_check_ptr}(
         }
 
         account_balance.write(account_id=account_id, token_type=token_type,
-value=new_balance);
+        value=new_balance);
         return ();
     }
 
     // @dev internal function that swaps tokens between the given account and
-the pool
+    // the pool
     // @param account_id Account whose tokens are to be swapped
     // @param token_from Token type to be swapped from
     // @param token_to Token type to be swapped to
     // @param amount_from Amount to be swapped
     func do_swap{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*,
-range_check_ptr}(
+    range_check_ptr}(
         account_id: felt, token_from: felt, token_to: felt, amount_from: felt
     ) -> (amount_to: felt) {
         alloc_locals;
 
         // get pool balance
         let (local amm_from_balance) = get_pool_token_balance(token_type =
-token_from);
+        token_from);
         let (local amm_to_balance) =
-get_pool_token_balance(token_type=token_to);
+        get_pool_token_balance(token_type=token_to);
 
         // calculate swap amount
         let (local amount_to, _) = unsigned_div_rem((amm_to_balance *
-amount_from), (amm_from_balance + amount_from));
+        amount_from), (amm_from_balance + amount_from));
 
         // update token_from balances
         modify_account_balance(account_id=account_id, token_type=token_from,
-amount=-amount_from);
+        amount=-amount_from);
         set_pool_token_balance(token_type=token_from, balance=(amm_from_balance
-+ amount_from));
+        + amount_from));
 
         // update token_to balances
         modify_account_balance(account_id=account_id, token_type=token_to,
-amount=amount_to);
+        amount=amount_to);
         set_pool_token_balance(token_type=token_to, balance=(amm_to_balance -
-amount_to));
+        amount_to));
 
         return (amount_to=amount_to);
     }
